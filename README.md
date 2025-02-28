@@ -28,7 +28,14 @@ pip install -e .
 cd examples/text_to_image/
 pip install -r requirements.txt
 ```
-
+And initialize an 🤗Accelerate environment with:
+```bash
+accelerate config
+```
+Or for a default accelerate configuration without answering questions about your environment:
+```bash
+accelerate config default
+```
 ## Datasets
 * ISTD [[link]](https://github.com/DeepInsight-PCALab/ST-CGAN)  
 * ISTD+ [[link]](https://github.com/cvlab-stonybrook/SID)
