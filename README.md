@@ -1,4 +1,4 @@
-# DPSSR
+# StableShadowRemoval
 This is the official implementation of the paper [Detail-Preserving Latent Diffusion for Stable Shadow Removal](https://arxiv.org/abs/2412.17630).
 
 <!-- [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/shadowformer-global-context-helps-image/shadow-removal-on-istd)](https://paperswithcode.com/sota/shadow-removal-on-istd?p=shadowformer-global-context-helps-image)
