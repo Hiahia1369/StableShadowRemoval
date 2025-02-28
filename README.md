@@ -28,7 +28,7 @@ pip install -e .
 cd examples/text_to_image/
 pip install -r requirements.txt
 ```
-And initialize an 🤗Accelerate environment with:
+And initialize an Accelerate environment with:
 ```bash
 accelerate config
 ```
