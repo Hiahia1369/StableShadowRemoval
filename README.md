@@ -1,6 +1,5 @@
 # StableShadowRemoval
-# OmniSR(AAAI'2025)
-This is the official implementation of the paper [OmniSR: Shadow Removal under Direct and Indirect Lighting](https://arxiv.org/abs/2410.01719).
+This is the official implementation of the paper [Detail-Preserving Latent Diffusion for Stable Shadow Removal](https://arxiv.org/abs/2412.17630).
 
 <!-- [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/shadowformer-global-context-helps-image/shadow-removal-on-istd)](https://paperswithcode.com/sota/shadow-removal-on-istd?p=shadowformer-global-context-helps-image)
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/shadowformer-global-context-helps-image/shadow-removal-on-adjusted-istd)](https://paperswithcode.com/sota/shadow-removal-on-adjusted-istd?p=shadowformer-global-context-helps-image)
@@ -21,10 +20,12 @@ For more details, please refer to our [original paper](https://arxiv.org/abs/241
 
 
 ## Requirement
-* Python 3.9
-* Pytorch 2.0.1
+* Python 3.10
 * CUDA 11.7
 ```bash
+cd diffusers
+pip install -e .
+cd examples/text_to_image/
 pip install -r requirements.txt
 ```
 
