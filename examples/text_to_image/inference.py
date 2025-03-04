@@ -37,10 +37,7 @@ seed = 1234  # You can change this to any integer value
 set_seed(seed)
 
 device = 'cuda'
-add_ssao = False
-add_depth = False
 prediction_type = "sample"
-start_from_xt = False
 num_train_timesteps = 1000
 output_type = 'pil'  # or latent for stage two
 # output_type = 'latent'
@@ -64,8 +61,6 @@ noise_scheduler = DDPMScheduler.from_pretrained(model_path, subfolder="scheduler
 if prediction_type is not None:
     # set prediction_type of scheduler if defined
     noise_scheduler.register_to_config(prediction_type=prediction_type)
-if start_from_xt and num_train_timesteps is not None:
-    noise_scheduler.register_to_config(num_train_timesteps=num_train_timesteps)
 pipe = StableDiffusionPipeline.from_pretrained(model_path, unet=unet, vae=vae, scheduler=noise_scheduler, torch_dtype=infer_torch_dtype)
 pipe.to("cuda")
 
