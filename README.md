@@ -92,7 +92,7 @@ prediction_type # Set to sample, diffusion predict the image latent instead of n
 ```
 
 ### Stage two
-1. Use the model trained in the stage one to generate the latent of the shadowfree image and set optional parameters
+1. Use the model trained in the stage one to generate the latent of the shadow-free image and set optional parameters
 ```bash
 python inference.py 
 ```
