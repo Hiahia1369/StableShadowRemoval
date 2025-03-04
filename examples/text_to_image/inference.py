@@ -18,7 +18,7 @@ model_path = "stabilityai/stable-diffusion-2"
 unet_path = "log/test/checkpoint-4/unet"
 vae_path = "log/test_vae/checkpoint-4"
 
-image_folder = "/home/disk1/shadow_dataset/ISTD+_Dataset/test/"
+image_folder = "ISTD+_Dataset/test/"
 image_dir = os.path.join(image_folder, "origin")
 result_dir = "log/result"
 image_filenames = sorted(os.listdir(image_dir))
