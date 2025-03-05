@@ -23,7 +23,7 @@ For more details, please refer to our [original paper](https://arxiv.org/abs/241
 * Python 3.10
 * CUDA 11.7
 ```bash
-cd diffusers
+cd StableShadowRemoval
 pip install -e .
 cd examples/text_to_image/
 pip install -r requirements.txt
@@ -184,11 +184,12 @@ Our implementation is based on [Diffusers](https://github.com/huggingface/diffus
 ## Citation
 Bibtex:
 ```
-@inproceedings{xu2025stableshadowremoval,
+@Inproceedings{xu_2025_CVPR
 title={Detail-Preserving Latent Diffusion for Stable Shadow Removal},
 author={Xu, Jiamin and Zheng, Yuxin and Li, Zelong and Wang, Chi and Gu, Renshu and Xu, Weiwei and Xu, Gang},
-booktitle={Proceedings of the CVPR Conference on Artificial Intelligence},
+booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
 year={2025}
+}
 ```
 
 ## Contact

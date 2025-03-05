@@ -800,7 +800,7 @@ class StableDiffusionPipeline(
         condition_image: Optional[Union[Image.Image, torch.Tensor]] = None,
         prompt: Union[str, List[str]] = None,
         dino: Optional[torch.Tensor] = None,
-        add_dim: bool = False,
+        add_cfw: bool = False,
         height: Optional[int] = None,
         width: Optional[int] = None,
         num_inference_steps: int = 50,
@@ -1015,7 +1015,7 @@ class StableDiffusionPipeline(
             latent_enc_features = None
             condition_features = self.vae.encode(condition_image)
             condition_latents = condition_features.latent_dist.sample()
-            if add_dim:
+            if add_cfw:
                 latent_enc_features = condition_features.enc_feature_list
             condition_latents = condition_latents * self.vae.config.scaling_factor
 

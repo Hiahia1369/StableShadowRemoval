@@ -12,12 +12,12 @@ import random
 import torch.nn.functional as F
 import torch.nn as nn
 
-vae_path = "/home/disk4/zyx/diffusers_log/vae/vae_DINO_train_cfw_WSRD_960_1104/checkpoint-25000/"
+vae_path = "log/test_vae"
 
-image_folder = "/home/disk2/dataset/WSRD_DNSR_25/validation/"
+image_folder = "ISTD+_Dataset/test/"
 image_dir = os.path.join(image_folder, "origin")
-latent_dir = "/home/disk4/zyx/diffusers_log/RGB/RGB_sample_WSRD_1030/result_e400_wsrd_val25_latent/"
-result_dir = "/home/disk4/zyx/diffusers_log/vae/vae_DINO_train_cfw_WSRD_960_1104/test/"
+latent_dir = "ISTD+_Dataset/test/latent"
+result_dir = "log/result"
 
 image_filenames = sorted(os.listdir(image_dir))
 latent_filenames = sorted(os.listdir(latent_dir))
@@ -34,7 +34,6 @@ def set_seed(seed):
 seed = 1234  # You can change this to any integer value
 set_seed(seed)
 
-add_x_feature = False
 add_cfw = False
 add_dino = False
 super_reshape = True
