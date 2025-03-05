@@ -100,24 +100,24 @@ def tensor_to_pil(image_tensor):
         image_list.append(image)
     return image_list
 
-def reshape_super_resolution(input_tensor):
+def reshape_super_resolution(input_tensor, k):
     B, C, H, W = input_tensor.shape
 
     tensor_1 = input_tensor.permute(0, 2, 3, 1)  # (B, H, W, C)
-    tensor_2 = tensor_1.reshape(B, H // 2, 2, W // 2, 2, C)
+    tensor_2 = tensor_1.reshape(B, H // k, k, W // k, k, C)
     tensor_3 = tensor_2.permute(0, 1, 3, 2, 4, 5)  # (B, H/3, W/3, 3, 3, C)
-    tensor_4 = tensor_3.reshape(B, H // 2, W // 2, 2 * 2 * C)
+    tensor_4 = tensor_3.reshape(B, H // k, W // k, k * k * C)
     output_tensor = tensor_4.permute(0, 3, 1, 2)  # (B, 3*3*C, H/3, W/3)
 
     return output_tensor
     
-def reverse_reshape_super_resolution(input_tensor):
+def reverse_reshape_super_resolution(input_tensor, k):
     B, C, H, W = input_tensor.shape
 
     tensor_1 = input_tensor.permute(0, 2, 3, 1)
-    tensor_2 = tensor_1.reshape(B, H, W, 2, 2, C // 4)
+    tensor_2 = tensor_1.reshape(B, H, W, k, k, C // k*k)
     tensor_3 = tensor_2.permute(0, 1, 3, 2, 4, 5) # (B, H/3, W/3, 3, 3, C)
-    tensor_4 = tensor_3.reshape(B, H * 2, W * 2, C // 4)
+    tensor_4 = tensor_3.reshape(B, H * k, W * k, C // k*k)
     out_tensor = tensor_4.permute(0, 3, 1, 2)  # (B, C, H, W)
 
     return out_tensor
@@ -152,7 +152,7 @@ def log_validation(val_dataloader, vae, args, accelerator, weight_dtype, epoch, 
                 condition_image_in = condition_image
                 if args.super_reshape:
                     condition_image_in = reshape_super_resolution(condition_image)
-                if args.add_dim:
+                if args.add_cfw:
                     dino = None
                     latent = latent / vae.module.config.scaling_factor
                     condition_features = vae.module.encode(condition_image_in)
@@ -173,7 +173,7 @@ def log_validation(val_dataloader, vae, args, accelerator, weight_dtype, epoch, 
                     out_images = vae.decode(latent, return_dict=False)[0]
 
                 if args.super_reshape:
-                    out_images = reverse_reshape_super_resolution(out_images)
+                    out_images = reverse_reshape_super_resolution(out_images, args.super_reshape_k)
 
             val_psnr.append(batch_PSNR(gt_image, out_images))
 
@@ -557,22 +557,28 @@ def parse_args(input_args=None):
         ),
     )
     parser.add_argument(
-        "--add_dim",
+        "--add_cfw",
         action="store_true",
         default=False,
-        help="whether to add cfw",
+        help="whether to add dim",
     )
     parser.add_argument(
         "--add_dino",
         action="store_true",
         default=False,
-        help="whether to add cfw",
+        help="whether to add dino",
     )
     parser.add_argument(
         "--super_reshape",
         action="store_true",
         default=False,
         help="whether to super_reshape",
+    )
+    parser.add_argument(
+        "--super_reshape_k",
+        type=int,
+        default=3,
+        help="super_reshape k",
     )
     parser.add_argument(
         "--num_train_timesteps",
@@ -924,14 +930,14 @@ def main():
     config_path = "./vae/config.json"
     with open(config_path, 'r') as f:
         config_dict = json.load(f)
-    if args.add_dim:
+    if args.add_cfw:
         config_dict["up_block_types"] = [
             "UpDecoderBlock2DCfw",
             "UpDecoderBlock2DCfw",
             "UpDecoderBlock2DCfw",
             "UpDecoderBlock2DCfw"
         ]
-    vae = AutoencoderKL(**config_dict, add_dim=args.add_dim, add_dino=args.add_dino)
+    vae = AutoencoderKL(**config_dict, add_cfw=args.add_cfw, add_dino=args.add_dino)
 
     vae_state_dict = vae.state_dict()
     vae_ori_state_dict = vae_ori.state_dict()
@@ -945,59 +951,59 @@ def main():
             print(f"skip {name} as not exist in vae_ori")
     vae.load_state_dict(vae_state_dict)
 
-    def _replace_vae_conv():
+    def _replace_vae_conv(k):
         # replace the first layer to accept 27 in_channels
         _weight = vae.encoder.conv_in.weight.clone()
         _bias = vae.encoder.conv_in.bias.clone()
-        _weight = _weight.repeat((1, 9, 1, 1))  # Keep selected channel(s)
+        _weight = _weight.repeat((1, k*k, 1, 1))  # Keep selected channel(s)
         # reduce the activation magnitude
         _weight *= 0.1
         # new conv_in channel
         _n_convin_out_channel = vae.encoder.conv_in.out_channels
 
         _new_conv_in = Conv2d(
-            27, _n_convin_out_channel, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)
+            3*k*k, _n_convin_out_channel, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)
         )
         _new_conv_in.weight = Parameter(_weight)
         _new_conv_in.bias = Parameter(_bias)
         vae.encoder.conv_in = _new_conv_in
-        vae.config.in_channels = 27
-        vae.config["in_channels"] = 27
+        vae.config.in_channels = 3*k*k
+        vae.config["in_channels"] = 3*k*k
         logging.info("vae conv_in layer is replaced")
 
         # replace the out layer to out 27 in_channels
         _weight = vae.decoder.conv_out.weight.clone()  # [4, 320, 3, 3]
         _bias = vae.decoder.conv_out.bias.clone()  # [4]
-        _weight = _weight.repeat((9, 1, 1, 1))  # Keep selected channel(s)
+        _weight = _weight.repeat((k*k, 1, 1, 1))  # Keep selected channel(s)
         # reduce the activation magnitude
         _weight *= 0.1
         # copy bias
-        _bias = _bias.repeat(9)
+        _bias = _bias.repeat(k*k)
         # new conv_out channel
         _n_convout_in_channel = vae.decoder.conv_out.in_channels
 
         _new_conv_out = Conv2d(
-            _n_convout_in_channel, 27, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)
+            _n_convout_in_channel, 3*k*k, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)
         )
         # replace config
         _new_conv_out.weight = Parameter(_weight)
         _new_conv_out.bias = Parameter(_bias)
         vae.decoder.conv_out = _new_conv_out
-        vae.config.out_channels = 27
-        vae.config["out_channels"] = 27
+        vae.config.out_channels = 3*k*k
+        vae.config["out_channels"] = 3*k*k
         logging.info("vae conv_out layer is replaced")
 
         return
     
     if args.super_reshape:
-        _replace_vae_conv()
+        _replace_vae_conv(args.super_reshape_k)
 
     # 1. fix VAE original parameters
     for param in vae.parameters():
         param.requires_grad = False
 
     # 2. unfix fuse_layer.parameters
-    if args.add_dim:
+    if args.add_cfw:
         for param in vae.decoder.up_blocks[1].fuse_layer.parameters():
             param.requires_grad = True
         for param in vae.decoder.up_blocks[2].fuse_layer.parameters():
@@ -1068,7 +1074,7 @@ def main():
         optimizer_cls = torch.optim.AdamW
     
     trainable_parameters = vae.parameters()
-    if args.add_dim:
+    if args.add_cfw:
         trainable_parameters = (list(vae.decoder.up_blocks[0].fuse_layer.parameters()) + 
                                 list(vae.decoder.up_blocks[1].fuse_layer.parameters()) + 
                                 list(vae.decoder.up_blocks[2].fuse_layer.parameters()) +
@@ -1238,11 +1244,11 @@ def main():
 
                 conditioning_pixel_values = batch["conditioning_pixel_values"]
                 if args.super_reshape:
-                    conditioning_pixel_values = reshape_super_resolution(batch["conditioning_pixel_values"])
+                    conditioning_pixel_values = reshape_super_resolution(batch["conditioning_pixel_values"], args.super_reshape_k)
 
                 condition_encode_features = None
                 dino = None
-                if args.add_dim:
+                if args.add_cfw:
                     condition_features = vae.module.encode(conditioning_pixel_values.to(weight_dtype))
                     condition_encode_features = condition_features.enc_feature_list
                     latent = (batch["latent_values"].to(weight_dtype)) / vae.module.config.scaling_factor

@@ -15,7 +15,7 @@ CUDA_VISIBLE_DEVICES="0,1" accelerate launch --num_processes=2 --main_process_po
   --validation_epochs=1 \
   --checkpointing_steps=4 \
   --max_test_samples=10 \
-  --add_dim \
+  --add_cfw \
   --add_dino \
   # --max_train_samples=32 \
   # --resume_from_checkpoint="checkpoint-4" \

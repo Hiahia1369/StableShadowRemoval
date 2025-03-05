@@ -84,7 +84,7 @@ class AutoencoderKL(ModelMixin, ConfigMixin, FromOriginalModelMixin):
         latents_mean: Optional[Tuple[float]] = None,
         latents_std: Optional[Tuple[float]] = None,
         force_upcast: float = True,
-        add_dim: bool = False,
+        add_cfw: bool = False,
         add_dino: bool = False,
         super_res: bool = False,
         add_x_feature: bool = False,
@@ -92,7 +92,7 @@ class AutoencoderKL(ModelMixin, ConfigMixin, FromOriginalModelMixin):
     ):
         super().__init__()
 
-        self.add_dim = add_dim
+        self.add_cfw = add_cfw
         self.add_x_feature = add_x_feature
         if self.add_x_feature:
             decoder_in_channel = latent_channels * 2
@@ -109,7 +109,7 @@ class AutoencoderKL(ModelMixin, ConfigMixin, FromOriginalModelMixin):
             act_fn=act_fn,
             norm_num_groups=norm_num_groups,
             double_z=True,
-            add_dim=add_dim
+            add_cfw=add_cfw
         )
 
         # pass init params to Decoder
@@ -121,7 +121,7 @@ class AutoencoderKL(ModelMixin, ConfigMixin, FromOriginalModelMixin):
             layers_per_block=layers_per_block,
             norm_num_groups=norm_num_groups,
             act_fn=act_fn,
-            add_dim=add_dim,
+            add_cfw=add_cfw,
             add_dino=add_dino,
             sample_size = sample_size
         )
@@ -276,7 +276,7 @@ class AutoencoderKL(ModelMixin, ConfigMixin, FromOriginalModelMixin):
             encoded_slices = [self.encoder(x_slice) for x_slice in x.split(1)]
             h = torch.cat(encoded_slices)
         else:
-            if self.add_dim:
+            if self.add_cfw:
                 h, enc_features = self.encoder(x)
             else:
                 h = self.encoder(x)
@@ -286,7 +286,7 @@ class AutoencoderKL(ModelMixin, ConfigMixin, FromOriginalModelMixin):
 
         if not return_dict:
             return (posterior,)
-        if self.add_dim:
+        if self.add_cfw:
             return AutoencoderKLOutput(latent_dist=posterior, enc_feature_list=enc_features)
         return AutoencoderKLOutput(latent_dist=posterior)
 
@@ -472,7 +472,7 @@ class AutoencoderKL(ModelMixin, ConfigMixin, FromOriginalModelMixin):
         """
         x = sample
         posterior = self.encode(x).latent_dist
-        # if self.add_dim:
+        # if self.add_cfw:
         #     enc_feature_list = self.encode(x).enc_feature_list
         if sample_posterior:
             z = posterior.sample(generator=generator)

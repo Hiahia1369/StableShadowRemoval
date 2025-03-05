@@ -80,12 +80,12 @@ class Encoder(nn.Module):
         act_fn: str = "silu",
         double_z: bool = True,
         mid_block_add_attention=True,
-        add_dim: bool=False
+        add_cfw: bool=False
     ):
         super().__init__()
         self.layers_per_block = layers_per_block
 
-        self.add_dim = add_dim
+        self.add_cfw = add_cfw
 
         self.conv_in = nn.Conv2d(
             in_channels,
@@ -116,7 +116,7 @@ class Encoder(nn.Module):
                 resnet_groups=norm_num_groups,
                 attention_head_dim=output_channel,
                 temb_channels=None,
-                add_dim=add_dim
+                add_cfw=add_cfw
             )
             self.down_blocks.append(down_block)
 
@@ -176,7 +176,7 @@ class Encoder(nn.Module):
             # down
             enc_features = []
             for down_block in self.down_blocks:
-                if self.add_dim:
+                if self.add_cfw:
                     sample, enc_feature = down_block(sample)
                     enc_features.append(enc_feature)
                 else:
@@ -185,7 +185,7 @@ class Encoder(nn.Module):
             # middle
             sample = self.mid_block(sample)
 
-            if self.add_dim:
+            if self.add_cfw:
                 enc_features.pop()
                 enc_features.append(sample)
 
@@ -195,7 +195,7 @@ class Encoder(nn.Module):
         sample = self.conv_act(sample)
         sample = self.conv_out(sample)
         
-        if self.add_dim:
+        if self.add_cfw:
             return sample, enc_features
 
         return sample
@@ -235,14 +235,14 @@ class Decoder(nn.Module):
         act_fn: str = "silu",
         norm_type: str = "group",  # group, spatial
         mid_block_add_attention=True,
-        add_dim: bool=False,
+        add_cfw: bool=False,
         add_dino: bool=False,
         sample_size: int = None
     ):
         super().__init__()
         self.layers_per_block = layers_per_block
 
-        self.add_dim = add_dim
+        self.add_cfw = add_cfw
 
         self.conv_in = nn.Conv2d(
             in_channels,
@@ -293,7 +293,7 @@ class Decoder(nn.Module):
                 attention_head_dim=output_channel,
                 temb_channels=temb_channels,
                 resnet_time_scale_shift=norm_type,
-                add_dim=add_dim,
+                add_cfw=add_cfw,
                 sample_size=sample_size,
                 layer_index=i,
                 add_dino = add_dino
@@ -369,7 +369,7 @@ class Decoder(nn.Module):
 
             # up
             for i, up_block in enumerate(self.up_blocks):
-                if self.add_dim and enc_features != None:
+                if self.add_cfw and enc_features != None:
                     if i == 3 or i == 2:
                         dino = None
                     if dino != None and sample.shape[2] != dino.shape[2]:

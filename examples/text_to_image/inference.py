@@ -41,7 +41,7 @@ prediction_type = "sample"
 num_train_timesteps = 1000
 output_type = 'pil'  # or latent for stage two
 # output_type = 'latent'
-add_dim = False
+add_cfw = False
 add_dino = False
 infer_torch_dtype = torch.float16
 
@@ -51,7 +51,7 @@ vae = AutoencoderKL.from_pretrained(
     torch_dtype=infer_torch_dtype,
     subfolder="vae"
 )
-add_dim = vae.config.add_dim
+add_cfw = vae.config.add_cfw
 add_dino = vae.config.add_dino
 if add_dino:
     DINO_Net = torch.hub.load('facebookresearch/dinov2', 'dinov2_vitl14').to(infer_torch_dtype).to(device)
@@ -103,7 +103,7 @@ with torch.no_grad():
                 input_dino = UpSample(condition_image).to(infer_torch_dtype).to(device)
                 dino = DINO_Net.get_intermediate_layers(input_dino, 4, True)[3]
             
-            image = pipe(condition_image, prompt, dino = dino, add_dim=add_dim, num_inference_steps=20, output_type=output_type).images[0]
+            image = pipe(condition_image, prompt, dino = dino, add_cfw=add_cfw, num_inference_steps=20, output_type=output_type).images[0]
 
             if output_type == 'pil':
                 image = image.crop((0, 0, width, height))

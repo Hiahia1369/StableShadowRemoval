@@ -74,7 +74,7 @@ def get_down_block(
     attention_head_dim: Optional[int] = None,
     downsample_type: Optional[str] = None,
     dropout: float = 0.0,
-    add_dim: bool = False
+    add_cfw: bool = False
 ):
     # If attn head dim is not defined, we default it to the number of heads
     if attention_head_dim is None:
@@ -215,7 +215,7 @@ def get_down_block(
             resnet_groups=resnet_groups,
             downsample_padding=downsample_padding,
             resnet_time_scale_shift=resnet_time_scale_shift,
-            add_dim = add_dim
+            add_cfw = add_cfw
         )
     elif down_block_type == "AttnDownEncoderBlock2D":
         return AttnDownEncoderBlock2D(
@@ -361,7 +361,7 @@ def get_up_block(
     attention_head_dim: Optional[int] = None,
     upsample_type: Optional[str] = None,
     dropout: float = 0.0,
-    add_dim: bool = False,
+    add_cfw: bool = False,
     add_dino: bool = False,
     sample_size: int = None,
     layer_index: int = None
@@ -1446,10 +1446,10 @@ class DownEncoderBlock2D(nn.Module):
         output_scale_factor: float = 1.0,
         add_downsample: bool = True,
         downsample_padding: int = 1,
-        add_dim: bool = False
+        add_cfw: bool = False
     ):
         super().__init__()
-        self.add_dim = add_dim
+        self.add_cfw = add_cfw
         resnets = []
 
         for i in range(num_layers):
@@ -1505,14 +1505,14 @@ class DownEncoderBlock2D(nn.Module):
         for resnet in self.resnets:
             hidden_states = resnet(hidden_states, temb=None)
 
-        if self.add_dim:
+        if self.add_cfw:
             enc_feature = hidden_states
 
         if self.downsamplers is not None:
             for downsampler in self.downsamplers:
                 hidden_states = downsampler(hidden_states)
                 
-        if self.add_dim:
+        if self.add_cfw:
             return hidden_states, enc_feature
         
         return hidden_states
