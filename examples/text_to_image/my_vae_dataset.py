@@ -20,19 +20,19 @@ class MyDataset(datasets.GeneratorBasedBuilder):
             datasets.SplitGenerator(
                 name=datasets.Split.TRAIN,
                 gen_kwargs={
-                    'text_filepath': '/home/disk1/shadow_dataset/ISTD+_Dataset/train_aug/train_vae.json',
-                    'image_dir': '/home/disk1/shadow_dataset/ISTD+_Dataset/train_aug/shadow_free/',
-                    'condition_image_dir': '/home/disk1/shadow_dataset/ISTD+_Dataset/train_aug/origin/',
-                    'latent_dir': '/home/disk1/shadow_dataset/ISTD+_Dataset/train_aug/latents_sample',
+                    'text_filepath': 'ISTD+_Dataset/train_aug/train_vae.json',
+                    'image_dir': 'ISTD+_Dataset/train_aug/shadow_free/',
+                    'condition_image_dir': 'ISTD+_Dataset/train_aug/origin/',
+                    'latent_dir': 'ISTD+_Dataset/train_aug/latents_sample',
                 },
             ),
             datasets.SplitGenerator(
                 name=datasets.Split.TEST,
                 gen_kwargs={
-                    'text_filepath': '/home/disk1/shadow_dataset/ISTD+_Dataset/test_aug/test_vae.json',
-                    'image_dir': '/home/disk1/shadow_dataset/ISTD+_Dataset/test_aug/shadow_free/',
-                    'condition_image_dir': '/home/disk1/shadow_dataset/ISTD+_Dataset/test_aug/origin/',
-                    'latent_dir': '/home/disk1/shadow_dataset/ISTD+_Dataset/test_aug/latents_sample',
+                    'text_filepath': 'ISTD+_Dataset/test_aug/test_vae.json',
+                    'image_dir': 'ISTD+_Dataset/test_aug/shadow_free/',
+                    'condition_image_dir': 'ISTD+_Dataset/test_aug/origin/',
+                    'latent_dir': 'ISTD+_Dataset/test_aug/latents_sample',
                 },
             ),
         ]

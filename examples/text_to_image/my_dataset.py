@@ -20,17 +20,17 @@ class MyDataset(datasets.GeneratorBasedBuilder):
             datasets.SplitGenerator(
                 name=datasets.Split.TRAIN,
                 gen_kwargs={
-                    'text_filepath': '/home/disk1/shadow_dataset/ISTD+_Dataset/train/train.json',
-                    'image_dir': '/home/disk1/shadow_dataset/ISTD+_Dataset/train/shadow_free/',
-                    'condition_image_dir': '/home/disk1/shadow_dataset/ISTD+_Dataset/train/origin/',
+                    'text_filepath': 'ISTD+_Dataset/train/train.json',
+                    'image_dir': 'ISTD+_Dataset/train/shadow_free/',
+                    'condition_image_dir': 'ISTD+_Dataset/train/origin/',
                 },
             ),
             datasets.SplitGenerator(
                 name=datasets.Split.TEST,
                 gen_kwargs={
-                    'text_filepath': '/home/disk1/shadow_dataset/ISTD+_Dataset/test/test.json',
-                    'image_dir': '/home/disk1/shadow_dataset/ISTD+_Dataset/test/shadow_free/',
-                    'condition_image_dir': '/home/disk1/shadow_dataset/ISTD+_Dataset/test/origin/',
+                    'text_filepath': 'ISTD+_Dataset/test/test.json',
+                    'image_dir': 'ISTD+_Dataset/test/shadow_free/',
+                    'condition_image_dir': 'ISTD+_Dataset/test/origin/',
                 },
             ),
         ]
