@@ -103,9 +103,9 @@ def reverse_reshape_super_resolution(input_tensor, k):
     B, C, H, W = input_tensor.shape
 
     tensor_1 = input_tensor.permute(0, 2, 3, 1)
-    tensor_2 = tensor_1.reshape(B, H, W, k, k, C // k*k)
+    tensor_2 = tensor_1.reshape(B, H, W, k, k, C // (k*k))
     tensor_3 = tensor_2.permute(0, 1, 3, 2, 4, 5) # (B, H/3, W/3, 3, 3, C)
-    tensor_4 = tensor_3.reshape(B, H * k, W * k, C // k*k)
+    tensor_4 = tensor_3.reshape(B, H * k, W * k, C // (k*k))
     out_tensor = tensor_4.permute(0, 3, 1, 2)  # (B, C, H, W)
 
     return out_tensor
@@ -127,6 +127,8 @@ with torch.no_grad():
                 if add_dino:
                     DINO_patch_size = 14
                     scale_factor = DINO_patch_size / 16
+                    if super_reshape:
+                            scale_factor = scale_factor / super_reshape_k
                     UpSample = nn.UpsamplingBilinear2d(
                         size=((int)(new_height * scale_factor), 
                             (int)(new_width * scale_factor)))
