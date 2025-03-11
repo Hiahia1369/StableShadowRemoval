@@ -16,7 +16,7 @@ We propose a two-stage fine-tuning pipeline to transform a pre-trained Stable Di
 For more details, please refer to our [original paper](https://arxiv.org/abs/2410.01719).
 
 
-<p align=center><img width="80%" src="doc/pipeline.png "/></p>
+<p align=center><img width="100%" src="doc/pipeline.png "/></p>
 
 
 ## Requirement
