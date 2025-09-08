@@ -90,7 +90,7 @@ condition_image_dir  # shadow image path
 CUDA_VISIBLE_DEVICES="0,1"  # Select GPU
 num_processes=2  # Set the number of GPUs
 mixed_precision="fp16"
-learning_rate=3e-05 # Correct setting (paper reports slightly different value)
+learning_rate=3e-05  # Correct setting (paper reports slightly different value)
 pretrained_model_name_or_path  # pretrained stable diffusion path
 train_data_dir  # dataset split file path
 prediction_type  # Set to sample, diffusion predict the image latent instead of noise
@@ -133,7 +133,7 @@ latent_dir  # predicted shadow-free latent path
 ./train_vae.sh
 ```
 ```python
-learning_rate=5e-05 # Correct setting (paper reports slightly different value)
+learning_rate=5e-05  # Correct setting (paper reports slightly different value)
 add_cfw=true  #add detail injection model
 add_dino=true  #add dino feature
 ```
