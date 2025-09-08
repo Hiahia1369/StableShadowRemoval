@@ -13,7 +13,7 @@ This is the official implementation of the paper [Detail-Preserving Latent Diffu
 ## Introduction
 We propose a two-stage fine-tuning pipeline to transform a pre-trained Stable Diffusion model into an image-conditional shadow-free image generator. This approach enables robust, high-resolution shadow removal without an input shadow mask.We introduce a shadow-aware detail injection module that utilizes the VAE encoder features to modulate the pre-trained VAE decoders, selectively aligning per-pixel details from the input image with those in the output shadow-free image.
 
-For more details, please refer to our [original paper](https://arxiv.org/abs/2410.01719).
+For more details, please refer to our [original paper](https://arxiv.org/abs/2412.17630).
 
 
 <p align=center><img width="100%" src="doc/pipeline.png "/></p>
